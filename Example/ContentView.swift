@@ -59,11 +59,36 @@ struct ProductDetail: View {
     @State var product: Product
 
     var body: some View {
-        VStack {
-            AsyncImage(url: URL(string: product.thumbnail))
-            Text(product.brand)
-            Text(product.description)
-            Text("$\(product.price)")
+        ScrollView(.vertical) {
+            VStack {
+                Text(product.brand)
+
+                AsyncImage(url: URL(string: product.thumbnail)) { image in
+                    image
+                      .resizable()
+                      .scaledToFill()
+                } placeholder: {
+                    Color.purple.opacity(0.1)
+                }
+
+                Text(product.description)
+                Text("$\(product.price)")
+
+                ScrollView(.horizontal) {
+                    LazyHStack() {
+                        ForEach(0..<product.images.count, id: \.self) { index in
+                            AsyncImage(url: URL(string: product.images[index])) { image in
+                                image
+                                  .resizable()
+                                  .scaledToFill()
+                                  .cornerRadius(10)
+                            } placeholder: {
+                                Color.purple.opacity(0.1)
+                            }
+                        }
+                    }
+                }.frame(maxWidth: .infinity, maxHeight: 100)
+            }
         }
     }
 }
