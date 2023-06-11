@@ -50,7 +50,7 @@ struct ContentView: View {
                 }
             }
         }
-        .onAppear(perform: loadProducts)
+        .onAppear(perform: loadProducts) 
         .padding()
     }
 }
@@ -71,28 +71,33 @@ struct ProductDetail: View {
 extension ContentView {
     func loadProducts() {
         let url = "https://dummyjson.com/products"
-
-        guard let url = URL(string: url) else {
-            print("cannot construct url :(")
-            return
+        loadCodableJson(from: url) { (response: ProductList) in
+            self.products = response.products
         }
-        
-        let request = URLRequest(url: url)
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data else {
-                print("no data loaded from url")
-                return
-            }
-
-            if let response = try? JSONDecoder().decode(ProductList.self, from: data) {
-                DispatchQueue.main.async {
-                    self.products = response.products
-                }
-            }
-        }.resume()
     }
 }
 
+func loadCodableJson<T>(from url: String, closure: @escaping (T)->Void) where T: Decodable {
+
+    guard let url = URL(string: url) else {
+        print("cannot construct url :(")
+        return
+    }
+    
+    let request = URLRequest(url: url)
+    URLSession.shared.dataTask(with: request) { data, response, error in
+        guard let data = data else {
+            print("no data loaded from url")
+            return
+        }
+
+        if let response = try? JSONDecoder().decode(T.self, from: data) {
+            DispatchQueue.main.async {
+                closure(response)
+            }
+        }
+    }.resume()
+}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
