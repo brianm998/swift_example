@@ -43,7 +43,7 @@ struct ContentView: View {
             } else {
                 NavigationStack {
                     List(products, id: \.id) { product in
-                        NavigationLink(product.brand) {
+                        NavigationLink(product.title) {
                             ProductDetail(product: product)                        
                         }
                     }
@@ -61,7 +61,7 @@ struct ProductDetail: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack {
-                Text(product.brand)
+                Text("\(product.brand) \(product.title)")
 
                 AsyncImage(url: URL(string: product.thumbnail)) { image in
                     image
@@ -73,6 +73,7 @@ struct ProductDetail: View {
 
                 Text(product.description)
                 Text("$\(product.price)")
+                  .foregroundColor(.green)
 
                 ScrollView(.horizontal) {
                     LazyHStack() {
